@@ -147,11 +147,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\DummyDataGenerator\DataGenerator.cpp" />
     <ClCompile Include="..\DummyDataGenerator\DbConnection.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Test\DataGeneratorTest.cpp" />
     <ClCompile Include="Test\DbConnectionTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Test\DataGeneratorTest.h" />
     <ClInclude Include="Test\DbConnectionTest.h" />
     <ClInclude Include="Test\MockDbConnection.h" />
     <ClInclude Include="Test\TestRunner.h" />

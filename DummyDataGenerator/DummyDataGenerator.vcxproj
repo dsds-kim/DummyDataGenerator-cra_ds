@@ -148,10 +148,12 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <ClCompile Include="DataGenerator.cpp" />
     <ClCompile Include="DbConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataGenerator.h" />
     <ClInclude Include="DbConnection.h" />
     <ClInclude Include="IDbConnection.h" />
   </ItemGroup>
