@@ -85,6 +85,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
        <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -103,6 +104,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
        <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -119,6 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
        <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -137,13 +140,20 @@
     <Link>
       <SubSystem>Console</SubSystem>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
        <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
   </ItemDefinitionGroup>
 
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DbConnection.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DbConnection.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

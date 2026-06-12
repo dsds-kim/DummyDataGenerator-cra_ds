@@ -21,14 +21,42 @@ msbuild DummyDataGenerator.slnx /p:Configuration=Release /p:Platform=x64
 
 출력 바이너리는 `x64/Debug/` 또는 `x64/Release/` 경로에 생성됨.
 
-## 아키텍처 의도
+## 아키텍처
 
-PoC 단계이므로 아직 소스 코드가 없음. 구현 시 고려할 구조:
+### DB 연결 (`DbConnection`)
 
-- **진입점**: `main()` — 설정 로드 → DB 연결 → 더미 데이터 생성 → DB 삽입 순서
-- **DB 연결**: ODBC, OLE DB, 또는 외부 라이브러리(libpq, MySQL Connector 등) 선택 필요
-- **데이터 생성**: 테이블 스키마 정의에 따라 각 컬럼 타입별 랜덤값 생성
-- **설정**: DB 연결 문자열, 대상 테이블, 생성 건수 등을 외부 파일(JSON/INI)로 분리 권장
+Windows 내장 ODBC(`odbc32.lib`)를 사용하여 외부 라이브러리 없이 동작. SQL Server, MySQL, PostgreSQL 등 ODBC 드라이버가 설치된 모든 DB를 지원.
+
+- `DbConnection(connectionString)` — 연결 문자열로 객체 생성
+- `connect()` / `disconnect()` — ODBC 환경/연결 핸들 생명주기 관리
+- `executeNonQuery(sql)` — INSERT, UPDATE, DELETE 실행; 실패 시 `std::runtime_error` throw
+
+연결 문자열 예시:
+```
+// SQL Server
+L"DRIVER={ODBC Driver 18 for SQL Server};SERVER=localhost;DATABASE=TestDB;UID=sa;PWD=password;"
+// MySQL
+L"DRIVER={MySQL ODBC 8.0 Driver};SERVER=localhost;DATABASE=TestDB;UID=root;PWD=password;"
+// PostgreSQL
+L"DRIVER={PostgreSQL Unicode};SERVER=localhost;DATABASE=TestDB;UID=postgres;PWD=password;"
+```
+
+### 흐름 (`main.cpp`)
+
+`DbConnection` 생성 → `connect()` → `executeNonQuery()` 반복 → `disconnect()`
+
+### 구현 현황
+
+| 기능 | 상태 |
+|---|---|
+| DB 연결 (`DbConnection`) | 완료 |
+| 더미 데이터 생성 | 미구현 |
+| 생성된 데이터 DB 삽입 | 미구현 |
+
+더미 데이터 생성 구현 시 고려할 사항:
+- 대상 테이블 스키마 정의 방식 (코드 하드코딩 vs 외부 파일)
+- 컬럼 타입별 랜덤값 생성 (문자열, 숫자, 날짜 등)
+- 생성 건수 및 DB 연결 정보를 외부 설정 파일(JSON/INI)로 분리
 
 ## 프로젝트 파일 구조
 
