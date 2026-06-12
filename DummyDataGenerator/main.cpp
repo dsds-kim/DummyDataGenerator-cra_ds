@@ -3,7 +3,7 @@
 
 int main()
 {
-    // 연결 문자열 예시 (환경에 맞게 수정)
+    // Adjust connection string to match your environment.
     // SQL Server : L"DRIVER={ODBC Driver 18 for SQL Server};SERVER=localhost;DATABASE=TestDB;UID=sa;PWD=password;"
     // MySQL      : L"DRIVER={MySQL ODBC 8.0 Driver};SERVER=localhost;DATABASE=TestDB;UID=root;PWD=password;"
     // PostgreSQL : L"DRIVER={PostgreSQL Unicode};SERVER=localhost;DATABASE=TestDB;UID=postgres;PWD=password;"
@@ -21,7 +21,7 @@ int main()
         std::cout << "DB connection successful\n";
 
         db.executeNonQuery(
-            L"INSERT INTO Users (Name, Email) VALUES (N'홍길동', N'hong@example.com')"
+            L"INSERT INTO Users (Name, Email) VALUES ('John', 'john@example.com')"
         );
         std::cout << "Data inserted successfully\n";
 

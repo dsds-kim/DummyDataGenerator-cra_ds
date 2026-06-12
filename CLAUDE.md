@@ -23,9 +23,11 @@ msbuild DummyDataGenerator.slnx /p:Configuration=Release /p:Platform=x64
 
 ## 아키텍처
 
-### DB 연결 (`DbConnection`)
+### DB 연결 (`IDbConnection` / `DbConnection`)
 
-Windows 내장 ODBC(`odbc32.lib`)를 사용하여 외부 라이브러리 없이 동작. SQL Server, MySQL, PostgreSQL 등 ODBC 드라이버가 설치된 모든 DB를 지원.
+`IDbConnection` — `connect`, `disconnect`, `isConnected`, `executeNonQuery`, `executeScalar`를 정의하는 순수 가상 인터페이스.
+
+`DbConnection` — Windows 내장 ODBC(`odbc32.lib`)를 사용한 실제 구현체. 외부 라이브러리 없이 동작하며 SQL Server, MySQL, PostgreSQL 등 ODBC 드라이버가 설치된 모든 DB를 지원.
 
 - `DbConnection(connectionString)` — 연결 문자열로 객체 생성
 - `connect()` / `disconnect()` — ODBC 환경/연결 핸들 생명주기 관리
@@ -58,15 +60,28 @@ L"DRIVER={PostgreSQL Unicode};SERVER=localhost;DATABASE=TestDB;UID=postgres;PWD=
 - 컬럼 타입별 랜덤값 생성 (문자열, 숫자, 날짜 등)
 - 생성 건수 및 DB 연결 정보를 외부 설정 파일(JSON/INI)로 분리
 
-## 프로젝트 파일 구조
+## 프로젝트 구조
+
+솔루션에 두 개의 독립 실행 프로젝트가 있음.
 
 ```
 DummyDataGenerator/
-├── DummyDataGenerator.slnx               # 솔루션 파일
-└── DummyDataGenerator/
-    ├── DummyDataGenerator.vcxproj        # 프로젝트 파일 (소스 파일 목록 관리)
-    ├── DummyDataGenerator.vcxproj.filters # Visual Studio 파일 분류
-    └── DummyDataGenerator.vcxproj.user   # 사용자별 로컬 설정 (git 제외 권장)
+├── DummyDataGenerator.slnx                        # 솔루션 (두 프로젝트 포함)
+├── DummyDataGenerator/                            # 앱 프로젝트
+│   ├── DummyDataGenerator.vcxproj
+│   ├── IDbConnection.h                            # 순수 가상 인터페이스
+│   ├── DbConnection.h / DbConnection.cpp          # ODBC 실제 구현체
+│   └── main.cpp
+└── DummyDataGeneratorTest/                        # 테스트 프로젝트
+    ├── DummyDataGeneratorTest.vcxproj
+    ├── main.cpp                                   # 테스트 러너 진입점
+    └── Test/
+        ├── TestRunner.h                           # ASSERT_TRUE / ASSERT_THROWS 매크로
+        ├── MockDbConnection.h                     # IDbConnection 인메모리 Mock 구현체
+        ├── DbConnectionTest.h
+        └── DbConnectionTest.cpp                   # Mock 기반 테스트 (실제 DB 불필요)
 ```
 
-새 `.cpp`/`.h` 파일 추가 시 `.vcxproj`의 `<ItemGroup>`에 `<ClCompile>`/`<ClInclude>` 항목을 등록해야 빌드에 포함됨.
+테스트 프로젝트는 `../DummyDataGenerator`를 추가 include 경로로 사용. 모든 테스트는 `MockDbConnection`을 사용하므로 실제 DB 없이 실행 가능.
+
+새 `.cpp`/`.h` 파일 추가 시 해당 프로젝트의 `.vcxproj` `<ItemGroup>`에 `<ClCompile>`/`<ClInclude>` 항목을 등록해야 빌드에 포함됨.

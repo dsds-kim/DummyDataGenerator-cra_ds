@@ -87,6 +87,37 @@ void DbConnection::executeNonQuery(const std::wstring& sql)
     SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 }
 
+long long DbConnection::executeScalar(const std::wstring& sql)
+{
+    if (!m_connected)
+        throw std::runtime_error("not connected to database");
+
+    SQLHSTMT hstmt = SQL_NULL_HSTMT;
+    if (SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc, &hstmt) != SQL_SUCCESS)
+        throw std::runtime_error("ODBC: failed to allocate statement handle");
+
+    SQLRETURN rc = SQLExecDirectW(hstmt, const_cast<SQLWCHAR*>(sql.c_str()), SQL_NTS);
+    if (rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO)
+    {
+        std::string msg = buildErrorMessage(SQL_HANDLE_STMT, hstmt, "SQLExecDirect");
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+        throw std::runtime_error(msg);
+    }
+
+    if (SQLFetch(hstmt) != SQL_SUCCESS)
+    {
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+        throw std::runtime_error("executeScalar: no rows returned");
+    }
+
+    SQLBIGINT value = 0;
+    SQLLEN indicator = 0;
+    SQLGetData(hstmt, 1, SQL_C_SBIGINT, &value, sizeof(value), &indicator);
+    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+
+    return static_cast<long long>(value);
+}
+
 std::string DbConnection::buildErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle, const char* context)
 {
     SQLWCHAR sqlState[6]{};
