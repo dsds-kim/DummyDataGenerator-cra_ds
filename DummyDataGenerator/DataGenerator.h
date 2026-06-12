@@ -1,4 +1,5 @@
 #pragma once
+#include <random>
 #include <string>
 #include <vector>
 
@@ -28,4 +29,7 @@ public:
 
     // Generates a random value per column and returns a complete INSERT statement.
     std::wstring buildInsertSql(const std::wstring& table, const std::vector<ColumnDef>& columns);
+
+private:
+    std::mt19937 m_rng{ std::random_device{}() };
 };

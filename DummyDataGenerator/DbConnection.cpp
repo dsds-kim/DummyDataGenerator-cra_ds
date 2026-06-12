@@ -127,8 +127,16 @@ std::string DbConnection::buildErrorMessage(SQLSMALLINT handleType, SQLHANDLE ha
 
     SQLGetDiagRecW(handleType, handle, 1, sqlState, &nativeError, message, SQL_MAX_MESSAGE_LENGTH, &msgLen);
 
-    std::wstring wMsg(message);
-    std::string msg(wMsg.begin(), wMsg.end());
+    std::string msg;
+    if (message[0] != L'\0')
+    {
+        int len = WideCharToMultiByte(CP_ACP, 0, message, -1, nullptr, 0, nullptr, nullptr);
+        if (len > 0)
+        {
+            msg.resize(len - 1);
+            WideCharToMultiByte(CP_ACP, 0, message, -1, &msg[0], len, nullptr, nullptr);
+        }
+    }
 
     return std::format("{}: [{}] {}", context, nativeError, msg);
 }

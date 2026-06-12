@@ -108,4 +108,4 @@ public:
 |---|---|
 | Step 1: DB Connection Tests | 완료 |
 | Step 2: Dummy Data Generation Tests | 완료 |
-| Step 3: Dummy Data Generation 구현 | 미시작 |
+| Step 3: Dummy Data Generation 구현 | 완료 |

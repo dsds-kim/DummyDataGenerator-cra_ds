@@ -1,3 +1,4 @@
+#include "DataGenerator.h"
 #include "DbConnection.h"
 #include <iostream>
 
@@ -14,17 +15,33 @@ int main()
         L"UID=sa;"
         L"PWD=password;";
 
+    const std::wstring targetTable = L"Users";
+    const int          rowCount    = 10;
+
+    // Schema: define target table columns and their generation rules.
+    const std::vector<ColumnDef> schema = {
+        { .name = L"Name",      .type = ColumnDef::Type::STRING, .maxLength = 50                                     },
+        { .name = L"Age",       .type = ColumnDef::Type::INT,    .intMin = 18,        .intMax = 80                   },
+        { .name = L"Score",     .type = ColumnDef::Type::DOUBLE, .dblMin = 0.0,       .dblMax = 100.0               },
+        { .name = L"BirthDate", .type = ColumnDef::Type::DATE,   .dateStart = L"1944-01-01", .dateEnd = L"2006-12-31" },
+        { .name = L"Email",     .type = ColumnDef::Type::EMAIL                                                       },
+    };
+
     try
     {
-        DbConnection db(connStr);
+        DbConnection  db(connStr);
+        DataGenerator gen;
+
         db.connect();
         std::cout << "DB connection successful\n";
 
-        db.executeNonQuery(
-            L"INSERT INTO Users (Name, Email) VALUES ('John', 'john@example.com')"
-        );
-        std::cout << "Data inserted successfully\n";
+        for (int i = 0; i < rowCount; ++i)
+        {
+            auto sql = gen.buildInsertSql(targetTable, schema);
+            db.executeNonQuery(sql);
+        }
 
+        std::wcout << rowCount << L" rows inserted into " << targetTable << L"\n";
         db.disconnect();
     }
     catch (const std::exception& e)
